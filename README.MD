@@ -10,3 +10,9 @@
 ## Conf
 - 全局配置
 
+## Contributing
+```
+git clone 
+cd zous-devops
+
+```
