@@ -12,7 +12,9 @@
 
 ## Contributing
 ```
-git clone 
+git clone https://github.com/iray100200/Zous-Devops.git
 cd zous-devops
-
+npm install -g
+zous git clone https://github.com/iray100200/Zous-Devops.git
+// 等待继续
 ```
