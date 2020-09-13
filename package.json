@@ -1,0 +1,33 @@
+{
+  "name": "devops",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "zous": "./cmd/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/register": "^7.11.5",
+    "@babel/traverse": "^7.11.5",
+    "@babel/types": "^7.11.5",
+    "apollo-server": "^2.17.0",
+    "cli-progress": "^3.8.2",
+    "cli-spinner": "^0.2.10",
+    "graphql": "^15.3.0",
+    "koa": "^2.13.0",
+    "lodash": "^4.17.20",
+    "log4js": "^6.3.0",
+    "mongoose": "^5.10.4",
+    "nodegit": "^0.27.0",
+    "ora": "^5.1.0",
+    "ssh2": "^0.8.9",
+    "webpack": "^4.44.1"
+  }
+}
