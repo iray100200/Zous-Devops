@@ -1,16 +1,16 @@
-## Scripts
+## ✨ Scripts
 - 配合[cmd]集成CLI命令行工具
 
-## Plugins
+## 📦 Plugins
 - 服务中间件
 
-## Web
+## 📚 Web
 - 前端展示
 
-## Conf
+## 🔨 Conf
 - 全局配置
 
-## Contributing
+## 🤝 Contributing
 ```
 git clone https://github.com/iray100200/Zous-Devops.git
 cd zous-devops
