@@ -1,61 +1,50 @@
 #!/usr/bin/env node
+
 require("@babel/register")
-const {Command} = require('commander')
+
+const inquirer = require('inquirer')
+const { Command } = require('commander')
 const program = new Command()
-const babel = require('@babel/core')
 const fs = require('fs')
-const traverse = require('@babel/traverse')
-const types = require('@babel/types')
-const path = require('path')
 const packageJson = JSON.parse(fs.readFileSync('package.json'))
+const Spawn = require('../scripts/spawn').default
+const checkEnv = require('../scripts/checkEnv').default
+const SSHClient = require('../scripts/ssh').default
 program.version(packageJson.version)
 
-/**
- * AST 预处理
- */
-const code = fs.readFileSync(path.resolve(process.cwd(), 'scripts/git/clone.js')).toString()
-const ast = babel.parse(code, {
-  sourceType: 'module'
-})
-traverse.default(ast, {
-  ExportDefaultDeclaration: function (path) {
-    const delcaration = path.node.declaration
-    const params = delcaration.params.map(o => {
-      if(types.isIdentifier(o)) {
-        return {
-          name: o.name,
-          required: true
-        }
+const promptList = [
+  {
+    type: 'input',
+    message: 'Test command: ',
+    name: 'content',
+    required: true,
+    default: "npm --version",
+    validate: function (answer) {
+      if (!answer) {
+        return false
       }
-      if(types.isAssignmentPattern(o)) {
-        return {
-          name: o.left.name,
-          required: false
-        }
-      }
-    })
+      return true
+    } 
   }
-})
+]
 
-/**
- * 生成CMD
- */
-const scriptsPath = path.resolve(process.cwd(), 'scripts')
-fs.readdir(scriptsPath, function (err, folders) {
-  if(err) return
-  folders.forEach(folder => {
-    const dir = path.join(scriptsPath, folder)
-    const stats = fs.statSync(dir)
-    if(stats.isDirectory()) {
-      program
-        .command(`${folder} <directive> [args...]`)
-        .action(function (directive, args) {
-          const script = require(require('path').resolve(process.cwd(), 'scripts', prefix, directive))
-          if(args) {
-            script.default(...args)
-          }
-        })
-    }
+program.command('ssh')
+  .action(function () {
+    const conn = new SSHClient('127.0.0.1', 2522)
+    conn.connect()
   })
-  program.parse(process.argv)
-})
+
+program
+  .command('test')
+  .action(function () {
+    inquirer.prompt(promptList).then(answer => {
+      Spawn.runScript(answer.content)
+    })
+  })
+
+program.command('env')
+  .action(function () {
+    checkEnv()
+  })
+
+program.parse(process.argv)
