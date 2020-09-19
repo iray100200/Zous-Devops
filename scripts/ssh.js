@@ -1,8 +1,19 @@
 const Client = require('ssh2').Client
-const inquirer = require('inquirer')
-const readline = require('readline')
-const conn = new Client()
 
+class Authentication {
+  constructor (username, password) {
+    this.username = username
+    this.password = password
+  }
+
+  username
+  password
+  privateKey
+
+  set (key, value) {
+    this[key] = value
+  }
+}
 
 export default class SSHClient {
   constructor (host, port) {
@@ -12,72 +23,67 @@ export default class SSHClient {
 
   host
   port
+  username
+  password
+  privateKey
+  connection = new Client()
 
-  connect () {
-
-    const promptList = [
-      {
-        type: 'input',
-        message: 'Username: ',
-        name: 'username',
-        required: true,
-        validate: function (answer) {
-          if (!answer) {
-            return false
-          }
-          return true
-        }
-      },
-      {
-        type: 'password',
-        message: 'Password: ',
-        name: 'password',
-        required: true,
-        validate: function (answer) {
-          if (!answer) {
-            return false
-          }
-          return true
-        }
-      }
-    ]
-
-    inquirer.prompt(promptList).then(answer => {
-      conn.on('ready', function () {
-        conn.shell(function (err, stream) {
-          if (err) throw err
-
-          stream.on('close', function () {
-            process.stdout.write('Connection closed.')
-            console.log('Stream :: close')
-            conn.end()
-          }).on('data', function (data) {
-            process.stdin.pause()
-            process.stdout.write(data)
-            process.stdin.resume()
-          }).stderr.on('data', function (data) {
-            process.stderr.write(data)
-          })
-
-          process.on('SIGINT', function () {
-            process.stdin.pause()
-            process.stdout.write('\nEnding session\n')
-
-            stream.end('exit\n')
-          })
-
-          process.stdin.on("data", (data) => {
-            stream.stdin.write(data)
-          })
-
-          process.stdin.setRawMode(true)
-        })
+  /**
+   * 
+   * @param {Authentication} authentication 用户登录信息
+   */
+  authenticate(authentication = new Authentication()) {
+    const {username, password, privateKey} = authentication
+    if(!username) {
+      return Promise.reject(new Error('username is required!'))
+    }
+    this.username = username
+    this.password = password
+    this.privateKey = privateKey
+    return new Promise((resolve, reject) => {
+      this.connection.on('ready', function () {
+        resolve(this.connection)
+      }).on('error', function (err) {
+        reject(err)
       }).connect({
         host: this.host,
         port: this.port,
-        username: answer.username,
-        password: answer.password
-        // privateKey: require('fs').readFileSync('/here/is/my/key')
+        username: this.username,
+        password: this.password,
+        privateKey: this.privateKey
+      })
+    })
+  }
+
+  interactive () {
+    return new Promise((resolve, reject) => {
+
+      const conn = this.connection
+
+      conn.shell(function (err, stream) {
+        if(err) {
+          return reject(err)
+        }
+
+        resolve(stream)
+  
+        stream.on('close', function () {
+          process.stdin.pause()
+          process.stdout.write('Connection closed!')
+          conn.end()
+        }).on('data', function (data) {
+          process.stdin.pause()
+          process.stdout.write(data)
+          process.stdin.resume()
+        }).stderr.on('data', function (data) {
+          process.stderr.write(data)
+        })
+  
+        process.stdin.on("data", (data) => {
+          stream.stdin.write(data)
+        })
+  
+        process.stdin.setRawMode(true)
       })
     })
   }

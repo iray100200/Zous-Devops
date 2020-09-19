@@ -9,7 +9,8 @@ const fs = require('fs')
 const packageJson = JSON.parse(fs.readFileSync('package.json'))
 const Spawn = require('../scripts/spawn').default
 const checkEnv = require('../scripts/checkEnv').default
-const SSHClient = require('../scripts/ssh').default
+const ssh = require('./ssh')
+const Spinner = require('../utils/console/spinner-progress')
 program.version(packageJson.version)
 
 const promptList = [
@@ -28,10 +29,16 @@ const promptList = [
   }
 ]
 
+program.command('spinner')
+  .action(function () {
+    const spinner = new Spinner()
+    spinner.setText('running...')
+    spinner.start()
+  })
+
 program.command('ssh')
   .action(function () {
-    const conn = new SSHClient('127.0.0.1', 2522)
-    conn.connect()
+    ssh()
   })
 
 program
