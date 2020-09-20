@@ -29,10 +29,10 @@ const promptList = [
 ]
 
 module.exports = function () {
-  function connect () {
+  function connect() {
     inquirer.prompt(promptList).then(async answer => {
       const sshClient = new SSHClient('127.0.0.1', 22)
-    
+
       try {
         await sshClient.authenticate({
           username: answer.username,
@@ -40,8 +40,8 @@ module.exports = function () {
         })
 
         await sshClient.interactive()
-      } catch (err) {
-        if (err.level === 'client-authentication') {
+      } catch(err) {
+        if(err.level === 'client-authentication') {
           process.stderr.write('The username/password is incorrect!\n')
           connect()
         }

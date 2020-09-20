@@ -17,11 +17,11 @@ const promptList = [
     required: true,
     default: "npm --version",
     validate: function (answer) {
-      if (!answer) {
+      if(!answer) {
         return false
       }
       return true
-    } 
+    }
   }
 ]
 
