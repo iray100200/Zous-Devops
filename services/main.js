@@ -33,7 +33,7 @@ visitFolders(path.resolve(__dirname, 'schema'), (pathname) => {
 
 const app = new Koa()
 const server = new ApolloServer({
-  typeDefs: mergeTypeDefs(typeDefs), 
+  typeDefs: mergeTypeDefs(typeDefs),
   resolvers: mergeResolvers(resolvers)
 })
 
